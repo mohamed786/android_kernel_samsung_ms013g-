@@ -1266,34 +1266,6 @@ static int check_unsafe_exec(struct linux_binprm *bprm)
 			bprm->unsafe |= LSM_UNSAFE_PTRACE;
 	}
 
-	/*
-	 * This isn't strictly necessary, but it makes it harder for LSMs to
-	 * mess up.
-	 */
-	if (task_no_new_privs(current))
-		bprm->unsafe |= LSM_UNSAFE_NO_NEW_PRIVS;
-
-	n_fs = 1;
-	spin_lock(&p->fs->lock);
-	rcu_read_lock();
-	for (t = next_thread(p); t != p; t = next_thread(t)) {
-		if (t->fs == p->fs)
-			n_fs++;
-	}
-	rcu_read_unlock();
-
-	if (p->fs->users > n_fs) {
-		bprm->unsafe |= LSM_UNSAFE_SHARE;
-	} else {
-		res = -EAGAIN;
-		if (!p->fs->in_exec) {
-			p->fs->in_exec = 1;
-			res = 1;
-		}
-	}
-	spin_unlock(&p->fs->lock);
-
-	return res;
 }
 
 /* 
@@ -1316,8 +1288,7 @@ int prepare_binprm(struct linux_binprm *bprm)
 	bprm->cred->euid = current_euid();
 	bprm->cred->egid = current_egid();
 
-	if (!(bprm->file->f_path.mnt->mnt_flags & MNT_NOSUID) &&
-	    !task_no_new_privs(current)) {
+	if (!(bprm->file->f_path.mnt->mnt_flags & MNT_NOSUID) ) {
 		/* Set-uid? */
 		if (mode & S_ISUID) {
 			bprm->per_clear |= PER_CLEAR_ON_SETID;
