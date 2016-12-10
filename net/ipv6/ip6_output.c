@@ -622,7 +622,7 @@ int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 	struct ipv6_pinfo *np = skb->sk ? inet6_sk(skb->sk) : NULL;
 	struct ipv6hdr *tmp_hdr;
 	struct frag_hdr *fh;
-	unsigned int mtu, hlen, left, len;
+	unsigned int hlen, left, len;
 	int hroom, troom;
 	__be32 frag_id = 0;
 	int ptr, offset = 0, err=0;
@@ -1103,7 +1103,7 @@ static inline int ip6_ufo_append_data(struct sock *sk,
 			int getfrag(void *from, char *to, int offset, int len,
 			int odd, struct sk_buff *skb),
 			void *from, int length, int hh_len, int fragheaderlen,
-			int transhdrlen, int mtu,unsigned int flags,
+			int transhdrlen,unsigned int flags,
 			struct rt6_info *rt)
 
 {
@@ -1182,11 +1182,7 @@ static void ip6_append_data_mtu(int *mtu,
 			 * this fragment is not first, the headers
 			 * space is regarded as data space.
 			 */
-<<<<<<< HEAD
-			*mtu = dst_mtu(rt->dst.path);
-=======
 			*mtu = orig_mtu;
->>>>>>> 817d4c3... ipv6: ip6_append_data_mtu do not handle the mtu of the second fragment properly
 		}
 		*maxfraglen = ((*mtu - fragheaderlen) & ~7)
 			      + fragheaderlen - sizeof(struct frag_hdr);
@@ -1203,11 +1199,7 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 	struct ipv6_pinfo *np = inet6_sk(sk);
 	struct inet_cork *cork;
 	struct sk_buff *skb, *skb_prev = NULL;
-<<<<<<< HEAD
-	unsigned int maxfraglen, fragheaderlen;
-=======
 	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu;
->>>>>>> 817d4c3... ipv6: ip6_append_data_mtu do not handle the mtu of the second fragment properly
 	int exthdrlen;
 	int dst_exthdrlen;
 	int hh_len;
@@ -1375,12 +1367,8 @@ alloc_new_skb:
 			/* update mtu and maxfraglen if necessary */
 			if (skb == NULL || skb_prev == NULL)
 				ip6_append_data_mtu(&mtu, &maxfraglen,
-<<<<<<< HEAD
-						    fragheaderlen, skb, rt);
-=======
 						    fragheaderlen, skb, rt,
 						    orig_mtu);
->>>>>>> 817d4c3... ipv6: ip6_append_data_mtu do not handle the mtu of the second fragment properly
 
 			skb_prev = skb;
 

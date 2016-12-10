@@ -2282,12 +2282,10 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 			if (arg2 != 1 || arg3 || arg4 || arg5)
 				return -EINVAL;
 
-			task_set_no_new_privs(current);
 			break;
 		case PR_GET_NO_NEW_PRIVS:
 			if (arg2 || arg3 || arg4 || arg5)
 				return -EINVAL;
-			return task_no_new_privs(current) ? 1 : 0;
 		default:
 			error = -EINVAL;
 			break;
