@@ -622,7 +622,7 @@ int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 	struct ipv6_pinfo *np = skb->sk ? inet6_sk(skb->sk) : NULL;
 	struct ipv6hdr *tmp_hdr;
 	struct frag_hdr *fh;
-	unsigned int hlen, left, len;
+	unsigned int mtu, hlen, left, len;
 	int hroom, troom;
 	__be32 frag_id = 0;
 	int ptr, offset = 0, err=0;
@@ -1103,7 +1103,7 @@ static inline int ip6_ufo_append_data(struct sock *sk,
 			int getfrag(void *from, char *to, int offset, int len,
 			int odd, struct sk_buff *skb),
 			void *from, int length, int hh_len, int fragheaderlen,
-			int transhdrlen,unsigned int flags,
+			int transhdrlen, int mtu,unsigned int flags,
 			struct rt6_info *rt)
 
 {
@@ -1199,10 +1199,11 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 	struct ipv6_pinfo *np = inet6_sk(sk);
 	struct inet_cork *cork;
 	struct sk_buff *skb, *skb_prev = NULL;
-	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu;
+	unsigned int maxfraglen, fragheaderlen, orig_mtu;
 	int exthdrlen;
 	int dst_exthdrlen;
 	int hh_len;
+	int mtu;
 	int copy;
 	int err;
 	int offset = 0;
